@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository} from 'typeorm';
+import { Repository } from 'typeorm';
 import { Board } from './board.entity';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
@@ -14,7 +14,7 @@ export class BoardService {
         this.boardRepository = boardRepository;
     }
 
-    create(createBoardDto: CreateBoardDto): Promise<Board> {
+    mapper(createBoardDto: CreateBoardDto): Promise<Board> {
         const board = new Board();
         board.writer = createBoardDto.writer;
         board.title = createBoardDto.title;
@@ -23,33 +23,34 @@ export class BoardService {
 
         return this.boardRepository.save(board);
     }
+    
     //게시글 생성
-    async createBoard(board: Board): Promise<void> {
+    async save(board: Board): Promise<void> {
         await this.boardRepository.save(board)
     }
 
     //게시글 조회
-    listBoard(): Promise<Board[]> {
+    getBoardRequestList(): Promise<Board[]> {
         return this.boardRepository.find();
     }
 
     //특정 작성자 게시글 조회
-    wirterlist(name: string): Promise<Board[]> {
-        return this.boardRepository.find({ writer:name })
+    getBoardRequestListByWriter(writer: string): Promise<Board[]> {
+        return this.boardRepository.find({ 
+            writer: writer
+        })
     }
 
     //게시글수정
-    async updateBoard(id: number, dto: UpdateBoardDto): Promise<Board> {
-        const toUpdate = await this.boardRepository.findOne(id);
-        delete toUpdate.title;
-        delete toUpdate.text;
-
-        const updated = Object.assign(toUpdate, dto);
-        return await this.boardRepository.save(updated);
+    async update(id: number, update: UpdateBoardDto) {
+        await this.boardRepository.update(id, { 
+            title: update.title, 
+            text: update.text 
+        })
     }
 
     //게시글 삭제
-    async removeBoard(id: number): Promise<void> {
+    async delete(id: number): Promise<void> {
         await this.boardRepository.delete(id);
     }
 }

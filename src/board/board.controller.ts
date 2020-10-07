@@ -10,16 +10,15 @@ export class BoardController {
         this.boardService = boardService;
     }
 
-    
     @Post()
-    create(@Body() createBoardDto: CreateBoardDto): Promise<Board> {
-        return this.boardService.create(createBoardDto);
+    mapper(@Body() createBoardDto: CreateBoardDto): Promise<Board> {
+        return this.boardService.mapper(createBoardDto);
     }
 
     //게시글 생성
     @Post()
-    async createBoard(@Body() board: Board): Promise<string> {
-        await this.boardService.createBoard(board);
+    async save(@Body() board: Board): Promise<string> {
+        await this.boardService.save(board);
         return Object.assign({
             data: { ...board },
             statusCode: 201,
@@ -29,10 +28,10 @@ export class BoardController {
 
     //게시글 조회
     @Get('list')
-    async listBoard(): Promise<Board[]> {
-        const roadList = await this.boardService.listBoard();
+    async getBoardRequestList(): Promise<Board[]> {
+        const getList = await this.boardService.getBoardRequestList();
         return Object.assign({
-            data: roadList,
+            data: getList,
             statusCode: 200,
             message: 'loading success'
         });
@@ -40,28 +39,28 @@ export class BoardController {
 
     //특정 작성자 조회
     @Get('list/:writer')
-    async writerlist(@Param('writer') name: string): Promise<Board[]> {
-        const writerList = await this.boardService.wirterlist(name);
+    async getBoardRequestListByWriter(@Param('writer') writer: string): Promise<Board[]> {
+        const getWriterList = await this.boardService.getBoardRequestListByWriter(writer);
         return Object.assign({
-            data: writerList,
+            data: getWriterList,
             statusCode: 200,
-            message: `loading success`
+            message: `loading successss`
         })
     }
     
-
     //게시글 수정
     @Put(':id')
-    async updateBoard(@Param('id') id: number, @Body('board') boardData : UpdateBoardDto) {
-        return await this.boardService.updateBoard(id, boardData); 
+    async update(@Param('id') id: number, @Body() update:UpdateBoardDto) {
+        await this.boardService.update(id, update); 
+        return Object.assign({
+            message: `updated`
+        })
     }
     
-
-
     //게시글 삭제
     @Delete(':id')
-    async removeBoard(@Param('id') id: number): Promise<string> {
-        await this.boardService.removeBoard(id);
+    async delete(@Param('id') id: number): Promise<string> {
+        await this.boardService.delete(id);
         return Object.assign({
             message: 'delete success'
         })
