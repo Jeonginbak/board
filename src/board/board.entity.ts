@@ -1,11 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
 @Entity("board")
-export class Board {
+export class Board { //BoardEntity로 수정
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: "varchar", length: 10, unique: true })
+    @Column({ type: "varchar", length: 10 })
     writer: string;
 
     @Column({ type: "varchar", length: 100 })
@@ -15,6 +15,6 @@ export class Board {
     text: string;
 
     @CreateDateColumn()
-    date
+    date: Date
     
 }
