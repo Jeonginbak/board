@@ -3,5 +3,4 @@ export class CreateBoardDto {
     title: string;
     text: string;
     date: Date;
-
 }
