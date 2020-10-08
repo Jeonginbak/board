@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Board } from './board.entity';
@@ -6,6 +6,8 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Injectable()
+//@Injectable decorator는 metadata를 붙여준다.
+//nest에 boardService가 nestProvider임을 알림.
 export class BoardService {
     constructor(
         @InjectRepository(Board)
@@ -13,6 +15,7 @@ export class BoardService {
     ) {
         this.boardRepository = boardRepository;
     }
+    // nest에서 지원하는 repository로 연결 이 로직에서는 interface가 없어도 됨.
 
     mapper(createBoardDto: CreateBoardDto): Promise<Board> {
         const board = new Board();
@@ -30,18 +33,26 @@ export class BoardService {
     }
 
     //게시글 조회
-    getBoardRequestList(): Promise<Board[]> {
-        return this.boardRepository.find();
+    async getBoardRequestList(): Promise<Board[]> {
+        const boardList = await this.boardRepository.find()
+        if (boardList === []) {
+            const error = { board: 'Empty List' }
+            throw new HttpException({ error }, 404)
+        }
+        return boardList
     }
 
     //특정 작성자 게시글 조회
-    getBoardRequestListByWriter(writer: string): Promise<Board[]> {
-        return this.boardRepository.find({ 
-            writer: writer
-        })
+    async getBoardRequestListByWriter(writer: string): Promise<Board[]> {
+        const writerList = await this.boardRepository.findOne(writer)
+        if (!writerList) {
+            const error = { writer: `${writer} Do Not Exists` }
+            throw new HttpException({ error }, 404)
+        }
+        return this.boardRepository.find({ writer: writer })
     }
 
-    //게시글수정
+    //게시글 수정
     async update(id: number, update: UpdateBoardDto) {
         await this.boardRepository.update(id, { 
             title: update.title, 
@@ -51,6 +62,12 @@ export class BoardService {
 
     //게시글 삭제
     async delete(id: number): Promise<void> {
+        const isExist = await this.boardRepository.findOne(id);
+        if (!isExist) {
+            const error = { id : 'DO NOT EXIST ID' }
+            throw new HttpException({ error }, 404)
+        } else {
         await this.boardRepository.delete(id);
+        }
     }
 }

@@ -6,9 +6,15 @@ import { BoardService } from './board.service';
 
 @Controller('board')
 export class BoardController {
-    constructor(private readonly boardService: BoardService) {
+    constructor(
+        private readonly boardService: BoardService
+    ){
         this.boardService = boardService;
     }
+    // controller에 service를 주입함. 종속성을 주입하기 위해서는 class의 constructor를 통해 주입해야함.
+    // boardService를 Injectable()을 사용하면 별도의 작업 없이 클래스 내부에서 this로 접근해 사용할 수 있다.
+    // nestjs는 constructor-based injection(생성자 기반 주입)이다.
+    // 특정상황에서는 property-based injection(속성 기반 주입)이 사용될 수 있다.
 
     @Post()
     mapper(@Body() createBoardDto: CreateBoardDto): Promise<Board> {
@@ -50,9 +56,10 @@ export class BoardController {
     
     //게시글 수정
     @Put(':id')
-    async update(@Param('id') id: number, @Body() update:UpdateBoardDto) {
-        await this.boardService.update(id, update); 
+    async update(@Param('id') id: number, @Body() update: UpdateBoardDto) {
+        const updateWriter = await this.boardService.update(id, update); 
         return Object.assign({
+            data: updateWriter,
             message: `updated`
         })
     }
