@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity("board")
 export class Board { //BoardEntity로 수정
@@ -16,5 +16,8 @@ export class Board { //BoardEntity로 수정
 
     @CreateDateColumn()
     date: Date
+
+    @UpdateDateColumn()
+    update: Date
     
 }

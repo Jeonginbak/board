@@ -28,7 +28,7 @@ export class BoardController {
         return Object.assign({
             data: { ...board },
             statusCode: 201,
-            message: 'creation success'
+            message: 'successed'
         });
     }
 
@@ -39,27 +39,28 @@ export class BoardController {
         return Object.assign({
             data: getList,
             statusCode: 200,
-            message: 'loading success'
+            message: `Total ${getList.length} searched`
         });
     }
 
     //특정 작성자 조회
-    @Get('list/:writer')
+    @Get(':writer')
     async getBoardRequestListByWriter(@Param('writer') writer: string): Promise<Board[]> {
         const getWriterList = await this.boardService.getBoardRequestListByWriter(writer);
         return Object.assign({
             data: getWriterList,
             statusCode: 200,
-            message: `loading successss`
+            message: `${writer}: Total ${getWriterList.length} searched`
         })
     }
     
     //게시글 수정
     @Put(':id')
-    async update(@Param('id') id: number, @Body() update: UpdateBoardDto) {
-        const updateWriter = await this.boardService.update(id, update); 
+    async update(@Param('id') id: number, @Body() update: UpdateBoardDto): Promise<string> {
+        await this.boardService.update(id, update); 
         return Object.assign({
-            data: updateWriter,
+            data: update,
+            statusCode: 200,            
             message: `updated`
         })
     }
@@ -69,7 +70,7 @@ export class BoardController {
     async delete(@Param('id') id: number): Promise<string> {
         await this.boardService.delete(id);
         return Object.assign({
-            message: 'delete success'
+            message: 'delete successed'
         })
     }
 }

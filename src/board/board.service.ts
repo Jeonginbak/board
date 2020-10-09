@@ -44,16 +44,16 @@ export class BoardService {
 
     //특정 작성자 게시글 조회
     async getBoardRequestListByWriter(writer: string): Promise<Board[]> {
-        const writerList = await this.boardRepository.findOne(writer)
+        const writerList = this.boardRepository.findOne(writer)
         if (!writerList) {
-            const error = { writer: `${writer} Do Not Exists` }
+            const error = { writer: `${writer} is Do Not Exists` }
             throw new HttpException({ error }, 404)
         }
-        return this.boardRepository.find({ writer: writer })
+        return await this.boardRepository.find({ writer: writer })
     }
 
     //게시글 수정
-    async update(id: number, update: UpdateBoardDto) {
+    async update(id: number, update: UpdateBoardDto): Promise<void> {
         await this.boardRepository.update(id, { 
             title: update.title, 
             text: update.text 
@@ -64,7 +64,7 @@ export class BoardService {
     async delete(id: number): Promise<void> {
         const isExist = await this.boardRepository.findOne(id);
         if (!isExist) {
-            const error = { id : 'DO NOT EXIST ID' }
+            const error = { id: 'Do Not Exists' }
             throw new HttpException({ error }, 404)
         } else {
         await this.boardRepository.delete(id);
